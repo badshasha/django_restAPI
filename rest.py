@@ -1,24 +1,24 @@
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
-from .models import Drink
-from .serializers import DrinkSerializer
-from rest_framework.decorators import api_view
-from rest_framework.response import  Response
-from rest_framework import status
+@api_view(['GET','PUT','DELETE'])
+def drinkinfo(request,id):
 
-@api_view(['GET','POST'])
-def drinkList(request):
-    # get all the drinks
-    all_drinks =  Drink.objects.all()
+    # validate information and find the object
+    # try:
+    #     drink = Drink.objects.filter(pk=id)
+    # except Drink.DoesNotExists:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
 
-    # send to client
-    serializer = DrinkSerializer(all_drinks, many=True)
-    return JsonResponse({'data':serializer.data}, safe=False)
+    drink = get_object_or_404(Drink,pk=id)
 
-    
-    if request.method == "POST":
-        serializer = DrinkSerializer(data=request.data)
+    if request.method == 'GET':
+        serialize = DrinkSerializer(drink)
+        return Response(serialize.data)
+    elif request.method == 'PUT':
+        serializer = DrinkSerializer(drink , data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data , status = status.HTTP_201_CREATED)
-
+            return Response(serializer.data)
+        else:
+            return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        drink.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
