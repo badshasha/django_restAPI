@@ -12,13 +12,20 @@ def drinkinfo(request,id):
     if request.method == 'GET':
         serialize = DrinkSerializer(drink)
         return Response(serialize.data)
+
+
     elif request.method == 'PUT':
+
         serializer = DrinkSerializer(drink , data=request.data)
+        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
+
+
+    elif request.method == 'DELETE':        
         drink.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
